@@ -1,0 +1,118 @@
+"""Shared layout for Biglo pages. Run `python3 _build/build.py` to regenerate all HTML."""
+import html, json
+
+SITE = "https://biglo.com"
+NAV = [
+    ("deals.html", "Deals"),
+    ("quotes.html", "Get Quotes"),
+    ("tools.html", "Tools"),
+    ("guides.html", "Guides"),
+    ("videos.html", "Videos"),
+    ("contests.html", "Win $500"),
+    ("support.html", "Support"),
+]
+VERSION = "1"
+
+
+def ad(slot="inContent"):
+    return (f'<div class="ad-slot" data-slot="{slot}"><div class="ad-label">Advertisement</div>'
+            f'<div class="ad-box"><div class="ad-ph">Ad space · <a href="advertise.html">&nbsp;Advertise on Biglo</a></div></div></div>')
+
+
+def newsletter_band():
+    return """
+<section class="section-tight"><div class="container"><div class="cta-band reveal">
+  <div><span class="eyebrow" style="background:rgba(255,255,255,.14);color:#fff">Free weekly</span>
+  <h2>One money-saving move, every week.</h2>
+  <p class="mb0">Top deals, bill hacks and new tools — in a 3-minute read. Spam-free. Unsubscribe anytime.</p></div>
+  <form data-form="newsletter" data-subject="Newsletter signup" data-success="You're in! Your first issue arrives this week." class="inline-form">
+    <input class="hp" name="_honey" tabindex="-1" autocomplete="off">
+    <label class="sr-only" for="nl-email">Email</label>
+    <input id="nl-email" type="email" name="Email" placeholder="you@email.com" required autocomplete="email">
+    <input type="hidden" name="List" value="Weekly newsletter">
+    <button class="btn btn-accent" type="submit">Subscribe free</button>
+  </form>
+</div></div></section>"""
+
+
+def page(path, title, desc, body, active="", schema=None, hero_class=""):
+    cur = ' aria-current="page"'
+    nav = "".join(
+        f'<a href="{h}"{cur if h == active else ""}>{t}</a>' for h, t in NAV)
+    canonical = SITE + "/" + ("" if path == "index.html" else path)
+    ld = ""
+    base_ld = {"@context": "https://schema.org", "@type": "WebSite", "name": "Biglo", "url": SITE,
+               "potentialAction": {"@type": "SearchAction", "target": SITE + "/deals.html?q={q}", "query-input": "required name=q"}}
+    for s in ([base_ld] if path == "index.html" else []) + (schema or []):
+        ld += f'<script type="application/ld+json">{json.dumps(s, ensure_ascii=False)}</script>\n'
+    t = html.escape(title)
+    d = html.escape(desc)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{t}</title>
+<meta name="description" content="{d}">
+<link rel="canonical" href="{canonical}">
+<meta name="theme-color" content="#0f9d58">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Biglo">
+<meta property="og:title" content="{t}"><meta property="og:description" content="{d}">
+<meta property="og:url" content="{canonical}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v={VERSION}">
+{ld}</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="domain-bar" role="note">💼 <a href="https://web.works/contact" target="_blank" rel="noopener">Contact, if you are interested in this website/domain name</a></div>
+<header class="site-header"><div class="container nav">
+  <a class="logo" href="index.html" aria-label="Biglo home"><span class="logo-mark">B</span><span>Big<span class="lo">lo</span></span></a>
+  <nav class="nav-links" id="nav" aria-label="Main">{nav}<a href="advertise.html">Advertise</a></nav>
+  <div class="nav-actions">
+    <a class="btn btn-primary btn-sm" href="quotes.html">Lower my bills</a>
+    <button class="icon-btn" data-theme-toggle aria-label="Toggle dark mode"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+    <button class="icon-btn menu-btn" aria-controls="nav" aria-expanded="false" aria-label="Menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  </div>
+</div></header>
+<main id="main">
+{body}
+</main>
+<footer class="site-footer"><div class="container">
+  <div class="footer-grid">
+    <div><a class="logo" href="index.html" style="color:#fff"><span class="logo-mark">B</span><span>Big<span class="lo">lo</span></span></a>
+      <p style="margin-top:12px">Big savings. Low bills. Deals, free calculators and no-obligation quotes that help you keep more of your money.</p>
+      <div class="socials" aria-label="Social"><a href="videos.html" aria-label="YouTube">YT</a><a href="contests.html" aria-label="Giveaways">🎁</a><a href="support.html" aria-label="Support Biglo">♥</a></div></div>
+    <div><h4>Save</h4><ul><li><a href="deals.html">Today's deals</a></li><li><a href="quotes.html">Get lower quotes</a></li><li><a href="tools.html">Calculators</a></li><li><a href="guides.html">Money guides</a></li><li><a href="videos.html">Videos</a></li></ul></div>
+    <div><h4>Community</h4><ul><li><a href="contests.html">Giveaways</a></li><li><a href="support.html">Support Biglo</a></li><li><a href="careers.html">Careers & creators</a></li><li><a href="submit-deal.html">Submit a deal</a></li></ul></div>
+    <div><h4>Business</h4><ul><li><a href="advertise.html">Advertise</a></li><li><a href="partners.html">Become a partner</a></li><li><a href="advertise.html#media-kit">Media kit</a></li><li><a href="https://web.works/contact" target="_blank" rel="noopener">Buy this domain</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li><li><a href="disclosure.html">How we make money</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="terms.html">Terms</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span>© <span data-year>2026</span> Biglo.com · All rights reserved.</span><span>Biglo is reader-supported. We may earn a commission from links — it never changes your price. <a href="disclosure.html">Learn more</a></span></div>
+</div></footer>
+<div class="cookie" role="dialog" aria-label="Cookie consent"><b>🍪 Cookies, the low-calorie kind.</b> We use cookies for ads, analytics and to remember your preferences. <a href="privacy.html">Privacy policy</a>
+  <div class="row"><button class="btn btn-ghost btn-sm" data-consent="essential">Essential only</button><button class="btn btn-primary btn-sm" data-consent="all">Accept all</button></div></div>
+<div class="sticky-cta"><a class="btn btn-primary" href="quotes.html">💸 Lower my bills — free</a></div>
+<div class="modal" id="exit-modal" role="dialog" aria-modal="true" aria-labelledby="exit-h"><div class="card">
+  <button class="icon-btn close" aria-label="Close">✕</button>
+  <div style="font-size:2.4rem">💌</div><h3 id="exit-h">Before you go — get the best deals weekly</h3>
+  <p>Plus a free <b>“50 Bills You Can Lower Today”</b> checklist.</p>
+  <form data-form="newsletter-exit" data-subject="Newsletter signup (exit)" data-success="Done! Check your inbox." class="inline-form">
+    <input class="hp" name="_honey" tabindex="-1" autocomplete="off"><input type="email" name="Email" placeholder="you@email.com" required aria-label="Email">
+    <input type="hidden" name="List" value="Exit-intent checklist"><button class="btn btn-primary" type="submit">Send it</button></form>
+  <p class="form-note">No spam, ever. Unsubscribe in one click.</p></div></div>
+<script src="assets/js/config.js?v={VERSION}"></script>
+<script src="assets/js/data.js?v={VERSION}"></script>
+<script src="assets/js/main.js?v={VERSION}" defer></script>
+</body>
+</html>
+"""
+
+
+def page_hero(crumb, h1, lead, extra=""):
+    return f"""<section class="page-hero"><div class="container">
+<div class="breadcrumbs"><a href="index.html">Home</a> › {crumb}</div>
+<h1>{h1}</h1><p class="lead">{lead}</p>{extra}</div></section>"""
